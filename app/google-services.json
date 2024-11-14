@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "929017437092",
+    "project_id": "crmmara-6c389",
+    "storage_bucket": "crmmara-6c389.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929017437092:android:9956338f847a32c0793f31",
+        "android_client_info": {
+          "package_name": "com.example.crm_mara"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkk_Omqh4KxCrtiGo5-dtyHBp9EVPfhi4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
