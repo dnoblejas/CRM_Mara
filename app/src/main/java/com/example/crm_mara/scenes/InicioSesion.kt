@@ -1,6 +1,7 @@
 package com.example.crm_mara.scenes
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.WbSunny
@@ -15,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -61,6 +64,8 @@ fun InicioSesion(navController: NavController) {
             value = contraseña,
             onValueChange = { contraseña = it },
             label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),  // Asegura que el texto se oculte
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
         )
 
