@@ -1,12 +1,10 @@
 package com.example.crm_mara.scenes
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,49 +14,53 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.crm_mara.R
 
 // Modelo de datos
 data class Corte(val name: String, val price: String, val imageRes: Int)
 
-// Pantalla principal
 @Composable
-fun TiposCortes(navController: NavController) {
-    // Datos de ejemplo con imágenes diferentes
+fun TiposCortes(navHostController: NavHostController) {
+    // Datos de los cortes, agregué 6 cortes adicionales
     val cortes = listOf(
         Corte("Corte 1", "$10", R.drawable.mara1),
         Corte("Corte 2", "$15", R.drawable.mara3),
         Corte("Corte 3", "$20", R.drawable.mara3),
         Corte("Corte 4", "$25", R.drawable.mara1),
         Corte("Corte 5", "$30", R.drawable.mara1),
-        Corte("Corte 6", "$35", R.drawable.mara3)
+        Corte("Corte 6", "$35", R.drawable.mara3),
+        Corte("Corte 7", "$12", R.drawable.mara1),  // Nuevas imágenes
+        Corte("Corte 8", "$18", R.drawable.mara1),
+        Corte("Corte 9", "$22", R.drawable.mara1),
+        Corte("Corte 10", "$28", R.drawable.mara1),
+        Corte("Corte 11", "$32", R.drawable.mara3),
+        Corte("Corte 12", "$40", R.drawable.mara3)
     )
 
-    // Layout principal
+    // Contenedor principal
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(16.dp)
     ) {
         // Título
         Text(
-            text = "Cortes",
-            fontSize = 24.sp,
+            text = "Cortes",  // Título en negro
+            fontSize = 26.sp,  // Aumenté el tamaño de la letra
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 16.dp),
-            color = Color.Black
+                .padding(bottom = 24.dp),  // Añadí más espacio abajo del título
+            color = Color.Black  // Color negro
         )
 
         // Grid de elementos
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // 2 columnas
+            columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(cortes.size) { index ->
@@ -68,53 +70,42 @@ fun TiposCortes(navController: NavController) {
     }
 }
 
-// Composable para un elemento de la cuadrícula
 @Composable
 fun CorteItem(corte: Corte) {
-    Card(
+    // Componente que va a contener la imagen y la información del corte
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f),
-        shape = RoundedCornerShape(8.dp),
-
+            .padding(8.dp)
+            .border(1.dp, Color.Black) // Borde negro alrededor del contenedor
+            .padding(8.dp), // Padding dentro del contenedor
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
+        // Imagen con un borde negro fino y sin fondo
+        Image(
+            painter = painterResource(id = corte.imageRes),
+            contentDescription = corte.name,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Imagen específica para cada corte
-            Image(
-                painter = painterResource(id = corte.imageRes),
-                contentDescription = corte.name,
-                modifier = Modifier
-                    .size(64.dp)
-                    .padding(top = 8.dp)
-            )
+                .size(100.dp) // Tamaño de la imagen
+                .border(1.dp, Color.Black) // Borde negro alrededor de la imagen
+        )
 
-            // Título
-            Text(
-                text = corte.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+        // Nombre del corte
+        Text(
+            text = corte.name,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-            // Precio
-            Text(
-                text = corte.price,
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-
-            // Icono de edición
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), // Usa un recurso drawable
-                contentDescription = "Edit Icon",
-                modifier = Modifier.size(24.dp)
-            )
-        }
+        // Precio
+        Text(
+            text = corte.price,
+            fontSize = 14.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
