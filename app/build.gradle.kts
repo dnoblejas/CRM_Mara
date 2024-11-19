@@ -1,16 +1,17 @@
 plugins {
+    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.android.application")
+    id("com.google.gms.google-services") // para Firebase
 }
 
 android {
     namespace = "com.example.crm_mara"
-    compileSdk = 35
+    compileSdk = 35  // Actualizado de 34 a 35
 
     defaultConfig {
         applicationId = "com.example.crm_mara"
-        minSdk = 31
-        targetSdk = 34
+        minSdk = 26
+        targetSdk = 35  // Actualizado de 34 a 35
         versionCode = 1
         versionName = "1.0"
 
@@ -50,9 +51,7 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-
+    // Dependencias básicas de Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,12 +61,14 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Dependencias de Firebase
+    implementation(platform(libs.firebase.bom)) // Usando el Firebase BOM
+    implementation(libs.firebase.analytics)     // Firebase Analytics
+
+    // Dependencias de Google Services
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.appcompat)
 }

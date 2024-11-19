@@ -17,7 +17,7 @@ import com.example.crm_mara.scenes.TiposCortes
 @Composable
 fun NavigationWrapper (navHostController: NavHostController) {
 
-    NavHost(navController = navHostController, startDestination = "pantallaLogin") {
+    NavHost(navController = navHostController, startDestination = "InicioSesion") {
 
         composable("InicioSesion") { InicioSesion(navHostController) }
         composable("Agenda") { Agenda(navHostController) }
