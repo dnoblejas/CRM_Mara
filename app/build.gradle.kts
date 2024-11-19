@@ -71,4 +71,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.appcompat)
+
+    //Para el uso de iconos
+    implementation ("androidx.compose.material:material-icons-extended:1.5.1")
+
 }

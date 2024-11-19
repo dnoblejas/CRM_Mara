@@ -1,17 +1,10 @@
 package com.example.crm_mara.scenes
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -41,25 +35,28 @@ fun InicioSesion(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding( start = 15.dp, end = 15.dp)
+            .padding(start = 15.dp, end = 15.dp)
     ) {
+        // Título MARA
         Text(
             text = "MARA",
             color = Color.Black,
-            fontSize = 24.sp,
+            fontSize = 48.sp,
             fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.size(48.dp))
 
+        // Campo de texto para usuario
         OutlinedTextField(
             value = nombre,
             onValueChange = { nombre = it },
-            label = { Text("Nombre") },
+            label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.size(16.dp))
 
+        // Campo de texto para contraseña
         OutlinedTextField(
             value = contraseña,
             onValueChange = { contraseña = it },
@@ -69,10 +66,12 @@ fun InicioSesion(navController: NavController) {
 
         Spacer(modifier = Modifier.size(24.dp))
 
+        // Mensaje de error si existe
         if (loginError.isNotEmpty()) {
             Text(text = loginError, color = Color.Red)
         }
 
+        // Botón para iniciar sesión
         Button(
             onClick = {
                 if (nombre.isNotEmpty() && contraseña.isNotEmpty()) {
@@ -97,33 +96,69 @@ fun InicioSesion(navController: NavController) {
                     loginError = "Por favor, completa todos los campos"
                 }
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFEB3B)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            contentPadding = PaddingValues(16.dp)
+                .padding(8.dp),
+            contentPadding = PaddingValues(12.dp)
         ) {
             Text(
-                text = "Entrar",
-                color = Color.Black,
-                fontSize = 32.sp
+                text = "Iniciar Sesión",
+                color = Color.White,
+                fontSize = 20.sp
             )
         }
 
+        // Botón para registro
         Button(
             onClick = { navController.navigate("Registro") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFEB3B)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            contentPadding = PaddingValues(16.dp)
+                .padding(8.dp),
+            contentPadding = PaddingValues(12.dp)
         ) {
             Text(
-                text = "Registrarse",
-                color = Color.Black,
-                fontSize = 20.sp,
-                style = TextStyle.Default
+                text = "Registro",
+                color = Color.White,
+                fontSize = 20.sp
             )
+        }
+
+        Spacer(modifier = Modifier.size(32.dp))
+
+        // Íconos de sol y luna
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Botón de sol (WbSunny)
+            IconButton(
+                onClick = { navController.navigate("InicioSesion") },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.WbSunny,
+                    contentDescription = "Modo claro",
+                    tint = Color.Black,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.size(16.dp))
+
+            // Botón de luna (DarkMode)
+            IconButton(
+                onClick = { /* Aquí puedes implementar el cambio de tema oscuro */ },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.DarkMode,
+                    contentDescription = "Modo oscuro",
+                    tint = Color.Black,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
         }
     }
 }
