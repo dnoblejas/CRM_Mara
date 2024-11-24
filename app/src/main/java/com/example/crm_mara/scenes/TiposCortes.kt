@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,7 @@ data class Corte(val name: String, val price: String, val imageRes: Int)
 
 @Composable
 fun TiposCortes(navHostController: NavHostController) {
-    // Datos de los cortes, agregué 6 cortes adicionales
+    // Datos de los cortes
     val cortes = listOf(
         Corte("Corte 1", "$10", R.drawable.mara1),
         Corte("Corte 2", "$15", R.drawable.mara3),
@@ -30,7 +31,7 @@ fun TiposCortes(navHostController: NavHostController) {
         Corte("Corte 4", "$25", R.drawable.mara1),
         Corte("Corte 5", "$30", R.drawable.mara1),
         Corte("Corte 6", "$35", R.drawable.mara3),
-        Corte("Corte 7", "$12", R.drawable.mara1),  // Nuevas imágenes
+        Corte("Corte 7", "$12", R.drawable.mara1),
         Corte("Corte 8", "$18", R.drawable.mara1),
         Corte("Corte 9", "$22", R.drawable.mara1),
         Corte("Corte 10", "$28", R.drawable.mara1),
@@ -46,13 +47,13 @@ fun TiposCortes(navHostController: NavHostController) {
     ) {
         // Título
         Text(
-            text = "Cortes",  // Título en negro
-            fontSize = 26.sp,  // Aumenté el tamaño de la letra
+            text = "Cortes",
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 24.dp),  // Añadí más espacio abajo del título
-            color = Color.Black  // Color negro
+                .padding(bottom = 24.dp),
+            color = Color.Black
         )
 
         // Grid de elementos
@@ -61,10 +62,25 @@ fun TiposCortes(navHostController: NavHostController) {
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f) // Ocupa el espacio disponible menos el de los botones
         ) {
             items(cortes.size) { index ->
                 CorteItem(corte = cortes[index])
+            }
+        }
+
+        // Botones de navegación
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(onClick = { navHostController.navigate("agenda") }) {
+                Text(text = "Ir a Agenda")
+            }
+            Button(onClick = { navHostController.navigate("citasClientes") }) {
+                Text(text = "Ir a Citas Clientes")
             }
         }
     }
@@ -72,26 +88,22 @@ fun TiposCortes(navHostController: NavHostController) {
 
 @Composable
 fun CorteItem(corte: Corte) {
-    // Componente que va a contener la imagen y la información del corte
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .border(1.dp, Color.Black) // Borde negro alrededor del contenedor
-            .padding(8.dp), // Padding dentro del contenedor
+            .border(1.dp, Color.Black)
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Imagen con un borde negro fino y sin fondo
         Image(
             painter = painterResource(id = corte.imageRes),
             contentDescription = corte.name,
             modifier = Modifier
-                .size(100.dp) // Tamaño de la imagen
-                .border(1.dp, Color.Black) // Borde negro alrededor de la imagen
+                .size(100.dp)
+                .border(1.dp, Color.Black)
         )
-
-        // Nombre del corte
         Text(
             text = corte.name,
             fontSize = 16.sp,
@@ -99,8 +111,6 @@ fun CorteItem(corte: Corte) {
             color = Color.Black,
             modifier = Modifier.padding(top = 8.dp)
         )
-
-        // Precio
         Text(
             text = corte.price,
             fontSize = 14.sp,
