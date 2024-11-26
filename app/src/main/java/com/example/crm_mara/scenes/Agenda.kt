@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -61,6 +67,52 @@ fun Agenda(navController: NavController) {
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
     val daysInMonth = currentYearMonth.lengthOfMonth()
     val firstDayOfMonth = currentYearMonth.atDay(1).dayOfWeek.value % 7 // Para alinear días
+
+    // Instancia de Firestore
+    val db = FirebaseFirestore.getInstance()
+
+    // Función para guardar una cita en Firestore
+    suspend fun guardarCitaEnFirestore(cliente: String, telefono: String, fecha: LocalDate, hora: String) {
+        val cita = hashMapOf(
+            "cliente" to cliente,
+            "telefono" to telefono,
+            "fecha" to fecha.toString(), // Guarda la fecha como String o como Timestamp
+            "hora" to hora
+        )
+
+        // Guardar la cita en la colección 'citas'
+        db.collection("citas")
+            .add(cita) // O puedes usar .document(citaId).set(cita) para asignar un id personalizado
+            .addOnSuccessListener {
+                Toast.makeText(navController.context, "Cita añadida correctamente", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(navController.context, "Error al añadir cita: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Función para cargar las citas desde Firestore
+    suspend fun cargarCitasDesdeFirestore() {
+        val result = db.collection("citas").get().await()
+        savedCitas.clear()
+
+        for (document in result) {
+            val cliente = document.getString("cliente") ?: ""
+            val telefono = document.getString("telefono") ?: ""
+            val fecha = document.getString("fecha") ?: ""
+            val hora = document.getString("hora") ?: ""
+
+            // Convertir la fecha de String a LocalDate si es necesario
+            val localDate = LocalDate.parse(fecha)
+
+            savedCitas.add(Cita(cliente, telefono, localDate, hora))
+        }
+    }
+
+    // Cargar las citas cuando la composición se ejecute
+    LaunchedEffect(Unit) {
+        cargarCitasDesdeFirestore()
+    }
 
     Column(
         modifier = Modifier
@@ -202,28 +254,18 @@ fun Agenda(navController: NavController) {
             label = { Text("Hora (ej. 18:00)") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Botón para guardar cita
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 if (selectedDate != null && cliente.isNotBlank() && telefono.isNotBlank() && hora.isNotBlank()) {
-                    savedCitas.add(
-                        Cita(
-                            cliente = cliente,
-                            telefono = telefono,
-                            fecha = selectedDate!!,
-                            hora = hora
-                        )
-                    )
+                    CoroutineScope(Dispatchers.IO).launch {
+                        guardarCitaEnFirestore(cliente, telefono, selectedDate!!, hora)
+                    }
                     cliente = ""
                     telefono = ""
                     hora = ""
-                    Toast.makeText(
-                        navController.context,
-                        "Cita añadida correctamente",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 } else {
                     Toast.makeText(
                         navController.context,
@@ -240,58 +282,29 @@ fun Agenda(navController: NavController) {
             Text("Guardar Cita")
         }
 
-        // Lista de citas guardadas
+        // Mostrar las citas guardadas
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Citas Guardadas:",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start)
-        )
-        savedCitas.forEach { cita ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .border(BorderStroke(1.dp, Color.Black))
-                    .padding(8.dp)
-            ) {
-                Column {
-                    Text("Cliente: ${cita.cliente}")
-                    Text("Teléfono: ${cita.telefono}")
-                    Text("Fecha: ${cita.fecha}")
-                    Text("Hora: ${cita.hora}")
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f)) // Empuja los botones hacia abajo
-
-        // Botones de navegación
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
-                onClick = { navController.navigate("TiposCortes") },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                )
-            ) {
-                Text(text = "Ir a Cortes")
-            }
-            Button(
-                onClick = { navController.navigate("CitasClientes") },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                )
-            ) {
-                Text(text = "Ir a Citas Clientes")
+            savedCitas.forEach { cita ->
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .border(BorderStroke(1.dp, Color.Black))
+                            .padding(8.dp)
+                    ) {
+                        Column {
+                            Text("Cliente: ${cita.cliente}")
+                            Text("Teléfono: ${cita.telefono}")
+                            Text("Fecha: ${cita.fecha}")
+                            Text("Hora: ${cita.hora}")
+                        }
+                    }
+                }
             }
         }
     }
