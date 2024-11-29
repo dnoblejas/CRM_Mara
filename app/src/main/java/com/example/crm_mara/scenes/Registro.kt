@@ -2,163 +2,136 @@ package com.example.crm_mara.scenes
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.regex.Pattern
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Registro(navController: NavController) {
-
-    // Eliminamos el contador de clics en el botón flotante
     Scaffold(
         topBar = {
-            // Colocamos la flecha para ir a la pantalla anterior
             IconButton(
-                onClick = { navController.popBackStack() }, // Regresar a la pantalla anterior
+                onClick = { navController.popBackStack() },
                 modifier = Modifier.padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Ir atrás"
-                )
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Ir atrás")
             }
         }
     ) { innerPadding ->
-
-        // Usamos innerPadding para asegurarnos que el contenido no se superponga a la barra superior
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(top = 50.dp) // Para darle espacio al icono de retroceso
-                    .padding(start = 10.dp)
-                    .padding(end = 10.dp)
+                    .padding(start = 10.dp, end = 10.dp)
             ) {
                 Spacer(modifier = Modifier.size(20.dp))
 
                 var nif by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = nif,
-                    onValueChange = { nif = it },
-                    label = { Text("NIF") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Espaciado entre los campos
-                )
-
                 var nombre by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Espaciado entre los campos
-                )
-
                 var direccion by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = direccion,
-                    onValueChange = { direccion = it },
-                    label = { Text("Dirección") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Espaciado entre los campos
-                )
-
                 var telefono by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = telefono,
-                    onValueChange = { telefono = it },
-                    label = { Text("Teléfono") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Espaciado entre los campos
-                )
-
                 var contraseña by remember { mutableStateOf("") }
+                var mensajeConfirmacion by remember { mutableStateOf("") }
+                var isLoading by remember { mutableStateOf(false) }
+
+                val db = FirebaseFirestore.getInstance()
+
+                OutlinedTextField(value = nif, onValueChange = { nif = it }, label = { Text("NIF") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.size(8.dp))
+                OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.size(8.dp))
+                OutlinedTextField(value = direccion, onValueChange = { direccion = it }, label = { Text("Dirección") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.size(8.dp))
+                OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Teléfono") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(
                     value = contraseña,
                     onValueChange = { contraseña = it },
                     label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),  // Asegura que el texto se oculte
+                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Espaciado entre los campos
+                    modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(modifier = Modifier.size(16.dp))
-
-                val db = FirebaseFirestore.getInstance()
-                val coleccion = "clientes"
-
-                var mensajeConfirmacion by remember { mutableStateOf("") }
-
-                // Aquí incluimos la contraseña en el HashMap
-                val dato = hashMapOf(
-                    "nif" to nif,
-                    "nombre" to nombre,
-                    "direccion" to direccion,
-                    "telefono" to telefono,
-                    "contraseña" to contraseña
-                )
 
                 Button(
                     onClick = {
-                        db.collection(coleccion)
-                            .document(nif)
-                            .set(dato)
-                            .addOnSuccessListener {
-                                mensajeConfirmacion = "Datos guardados correctamente"
-                                // Limpiar los campos después de guardar
-                                nif = ""
-                                nombre = ""
-                                direccion = ""
-                                telefono = ""
-                                contraseña = ""
+                        if (nif.isEmpty() || nombre.isEmpty() || direccion.isEmpty() || telefono.isEmpty() || contraseña.isEmpty()) {
+                            mensajeConfirmacion = "Por favor, completa todos los campos"
+                            return@Button
+                        }
+
+                        if (!Pattern.matches("\\d{8}[A-Za-z]", nif)) {
+                            mensajeConfirmacion = "NIF no válido"
+                            return@Button
+                        }
+
+                        if (!Pattern.matches("\\d{9}", telefono)) {
+                            mensajeConfirmacion = "Teléfono no válido"
+                            return@Button
+                        }
+
+                        isLoading = true
+                        db.collection("clientes").document(nif).get().addOnSuccessListener { document ->
+                            if (document.exists()) {
+                                isLoading = false
+                                mensajeConfirmacion = "El NIF ya está registrado"
+                            } else {
+                                val dato = hashMapOf(
+                                    "nif" to nif,
+                                    "nombre" to nombre,
+                                    "direccion" to direccion,
+                                    "telefono" to telefono,
+                                    "contraseña" to contraseña
+                                )
+
+                                db.collection("clientes")
+                                    .document(nif)
+                                    .set(dato)
+                                    .addOnSuccessListener {
+                                        isLoading = false
+                                        mensajeConfirmacion = "Datos guardados correctamente"
+                                        nif = ""; nombre = ""; direccion = ""; telefono = ""; contraseña = ""
+                                    }
+                                    .addOnFailureListener {
+                                        isLoading = false
+                                        mensajeConfirmacion = "No se ha podido guardar"
+                                    }
                             }
-                            .addOnFailureListener {
-                                mensajeConfirmacion = "No se ha podido guardar"
-                                // Limpiar los campos en caso de error
-                                nif = ""
-                                nombre = ""
-                                direccion = ""
-                                telefono = ""
-                                contraseña = ""
-                            }
+                        }
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .height(56.dp), // Tamaño mayor del botón
-                    contentPadding = PaddingValues(16.dp),
-                    shape = MaterialTheme.shapes.medium // Borde redondeado
+                    enabled = !isLoading,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Guardar", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text(text = "Guardar", color = Color.White)
+                    }
                 }
 
-                Spacer(modifier = Modifier.size(5.dp))
+                Spacer(modifier = Modifier.size(8.dp))
 
-                Text(text = mensajeConfirmacion, fontWeight = FontWeight.Bold)
+                Text(
+                    text = mensajeConfirmacion,
+                    color = if (mensajeConfirmacion.contains("correctamente")) Color.Green else Color.Red,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }

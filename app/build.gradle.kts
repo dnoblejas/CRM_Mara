@@ -63,8 +63,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Dependencias de Firebase
-    implementation(platform(libs.firebase.bom)) // Usando el Firebase BOM
-    implementation(libs.firebase.analytics)     // Firebase Analytics
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(platform(libs.firebase.bom))
+    //INCLUIR FIREBASE PARA PODER USAR CLOUD FIRESTORE
+    implementation(libs.firebase.analytics)
 
     // Dependencias de Google Services
     implementation("com.google.android.gms:play-services-location:21.3.0")
