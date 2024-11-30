@@ -76,13 +76,12 @@ fun Agenda(navController: NavController) {
         val cita = hashMapOf(
             "cliente" to cliente,
             "telefono" to telefono,
-            "fecha" to fecha.toString(), // Guarda la fecha como String o como Timestamp
+            "fecha" to fecha.toString(),
             "hora" to hora
         )
 
-        // Guardar la cita en la colección 'citas'
         db.collection("citas")
-            .add(cita) // O puedes usar .document(citaId).set(cita) para asignar un id personalizado
+            .add(cita)
             .addOnSuccessListener {
                 Toast.makeText(navController.context, "Cita añadida correctamente", Toast.LENGTH_SHORT).show()
             }
@@ -102,9 +101,7 @@ fun Agenda(navController: NavController) {
             val fecha = document.getString("fecha") ?: ""
             val hora = document.getString("hora") ?: ""
 
-            // Convertir la fecha de String a LocalDate si es necesario
             val localDate = LocalDate.parse(fecha)
-
             savedCitas.add(Cita(cliente, telefono, localDate, hora))
         }
     }
@@ -136,19 +133,17 @@ fun Agenda(navController: NavController) {
                 .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            // Botón de "Mes Anterior"
             Button(
                 onClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
                     contentColor = Color.Black
                 ),
-                modifier = Modifier.size(36.dp) // Tamaño más pequeño
+                modifier = Modifier.size(36.dp)
             ) {
                 Text("<", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
-            // Título del mes y año
             Text(
                 text = "${currentYearMonth.month.getDisplayName(TextStyle.FULL, Locale("es"))} ${currentYearMonth.year}",
                 fontSize = 20.sp,
@@ -157,14 +152,13 @@ fun Agenda(navController: NavController) {
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            // Botón de "Mes Siguiente"
             Button(
                 onClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
                     contentColor = Color.Black
                 ),
-                modifier = Modifier.size(36.dp) // Tamaño más pequeño
+                modifier = Modifier.size(36.dp)
             ) {
                 Text(">", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -172,12 +166,11 @@ fun Agenda(navController: NavController) {
 
         // Calendario
         LazyVerticalGrid(
-            columns = GridCells.Fixed(7), // Días de la semana
+            columns = GridCells.Fixed(7),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            // Encabezado: Días de la semana
             val weekDays = listOf("L", "M", "X", "J", "V", "S", "D")
             weekDays.forEach { day ->
                 item {
@@ -191,39 +184,41 @@ fun Agenda(navController: NavController) {
                 }
             }
 
-            // Espacios vacíos antes del primer día del mes
             repeat(firstDayOfMonth) {
                 item { Spacer(modifier = Modifier.height(40.dp)) }
             }
 
-            // Días del mes
             for (day in 1..daysInMonth) {
-                val date = currentYearMonth.atDay(day)
+                val date = runCatching { currentYearMonth.atDay(day) }.getOrNull()
+
                 item {
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .border(
-                                BorderStroke(
-                                    if (selectedDate == date) 2.dp else 1.dp,
-                                    if (selectedDate == date) Color.Blue else Color.Gray
+                    if (date != null) {
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .border(
+                                    BorderStroke(
+                                        if (selectedDate == date) 2.dp else 1.dp,
+                                        if (selectedDate == date) Color.Blue else Color.Gray
+                                    )
                                 )
+                                .clickable { selectedDate = date }
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = day.toString(),
+                                color = if (selectedDate == date) Color.Blue else Color.Black
                             )
-                            .clickable { selectedDate = date } // Seleccionar el día
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = day.toString(),
-                            color = if (selectedDate == date) Color.Blue else Color.Black
-                        )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.height(40.dp))
                     }
                 }
             }
         }
 
-        // Mostrar fecha seleccionada
         selectedDate?.let {
             Text(
                 text = "Fecha seleccionada: $it",
@@ -232,7 +227,6 @@ fun Agenda(navController: NavController) {
             )
         }
 
-        // Formulario para agregar citas
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = cliente,
@@ -255,7 +249,6 @@ fun Agenda(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Botón para guardar cita
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
@@ -282,7 +275,6 @@ fun Agenda(navController: NavController) {
             Text("Guardar Cita")
         }
 
-        // Mostrar las citas guardadas
         Spacer(modifier = Modifier.height(16.dp))
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
