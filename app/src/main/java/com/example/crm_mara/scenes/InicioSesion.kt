@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.crm_mara.ui.theme.ZendotsFamily
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -33,7 +34,25 @@ fun InicioSesion(navController: NavController) {
             .fillMaxSize()
             .padding(start = 15.dp, end = 15.dp)
     ) {
-        Text(text = "MARA", color = Color.Black, fontSize = 48.sp)
+        // Texto dividido en dos líneas
+        Text(
+            text = "MA",
+            color = Color.Black,
+            fontSize = 90.sp,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = ZendotsFamily,
+                fontSize = 90.sp
+            )
+        )
+        Text(
+            text = "RA",
+            color = Color.Black,
+            fontSize = 90.sp,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = ZendotsFamily,
+                fontSize = 90.sp
+            )
+        )
         Spacer(modifier = Modifier.size(48.dp))
 
         OutlinedTextField(
