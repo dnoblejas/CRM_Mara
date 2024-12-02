@@ -46,6 +46,7 @@ import java.util.Locale
 
 // Modelo de Cita
 data class Cita(
+    val id: String? = null, // Agregar el id para identificar la cita
     val cliente: String,
     val telefono: String,
     val fecha: LocalDate,
@@ -71,42 +72,59 @@ fun Agenda(navController: NavController) {
     // Instancia de Firestore
     val db = FirebaseFirestore.getInstance()
 
-    // Función para guardar una cita en Firestore
-    suspend fun guardarCitaEnFirestore(cliente: String, telefono: String, fecha: LocalDate, hora: String) {
-        val cita = hashMapOf(
-            "cliente" to cliente,
-            "telefono" to telefono,
-            "fecha" to "${fecha}T$hora", // Guardar fecha y hora combinadas
-            "hora" to hora
+    // Función para guardar o actualizar una cita en Firestore
+    suspend fun guardarOActualizarCitaEnFirestore(cita: Cita) {
+        val citaMap = hashMapOf(
+            "cliente" to cita.cliente,
+            "telefono" to cita.telefono,
+            "fecha" to "${cita.fecha}T${cita.hora}", // Guardar fecha y hora combinadas
+            "hora" to cita.hora
         )
 
-        db.collection("citas")
-            .add(cita)
-            .addOnSuccessListener {
-                Toast.makeText(navController.context, "Cita añadida correctamente", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(navController.context, "Error al añadir cita: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        if (cita.id == null) {
+            // Si no tiene ID, es una nueva cita, la agregamos
+            db.collection("citas")
+                .add(citaMap)
+                .addOnSuccessListener {
+                    Toast.makeText(navController.context, "Cita añadida correctamente", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(navController.context, "Error al añadir cita: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // Si tiene ID, actualizamos la cita existente
+            db.collection("citas")
+                .document(cita.id) // Usamos el ID para identificar el documento
+                .set(citaMap)
+                .addOnSuccessListener {
+                    Toast.makeText(navController.context, "Cita actualizada correctamente", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(navController.context, "Error al actualizar cita: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     // Función para cargar las citas desde Firestore
     suspend fun cargarCitasDesdeFirestore() {
         val result = db.collection("citas").get().await()
-        savedCitas.clear()
+        val newCitas = mutableListOf<Cita>()
 
         for (document in result) {
+            val id = document.id // El ID del documento de Firestore
             val cliente = document.getString("cliente") ?: ""
             val telefono = document.getString("telefono") ?: ""
             val fechaString = document.getString("fecha") ?: ""
             val hora = document.getString("hora") ?: ""
 
-            // Parsear fecha y hora
             val parts = fechaString.split("T")
             val localDate = runCatching { LocalDate.parse(parts[0]) }.getOrElse { LocalDate.now() }
 
-            savedCitas.add(Cita(cliente, telefono, localDate, hora))
+            newCitas.add(Cita(id, cliente, telefono, localDate, hora))
         }
+
+        savedCitas.clear()
+        savedCitas.addAll(newCitas)
     }
 
     // Cargar las citas cuando la composición se ejecute
@@ -256,13 +274,24 @@ fun Agenda(navController: NavController) {
         Button(
             onClick = {
                 if (selectedDate != null && cliente.isNotBlank() && telefono.isNotBlank() && hora.isNotBlank()) {
+                    // Crear un objeto Cita con los datos modificados
+                    val citaModificada = Cita(
+                        id = null, // ID se asigna después si es una nueva cita
+                        cliente = cliente,
+                        telefono = telefono,
+                        fecha = selectedDate!!,
+                        hora = hora
+                    )
+
                     CoroutineScope(Dispatchers.IO).launch {
-                        guardarCitaEnFirestore(cliente, telefono, selectedDate!!, hora)
-                        cargarCitasDesdeFirestore() // Recargar citas después de guardar
+                        guardarOActualizarCitaEnFirestore(citaModificada)
+                        cargarCitasDesdeFirestore() // Recargar citas después de actualizar
                     }
+
                     cliente = ""
                     telefono = ""
                     hora = ""
+                    selectedDate = null
                 } else {
                     Toast.makeText(
                         navController.context,
@@ -280,26 +309,22 @@ fun Agenda(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            savedCitas.forEach { cita ->
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .border(BorderStroke(1.dp, Color.Black))
-                            .padding(8.dp)
-                    ) {
-                        Column {
-                            Text("Cliente: ${cita.cliente}")
-                            Text("Teléfono: ${cita.telefono}")
-                            Text("Fecha: ${cita.fecha}")
-                            Text("Hora: ${cita.hora}")
-                        }
-                    }
+
+        // Mostrar citas existentes
+        savedCitas.forEach { cita ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .border(BorderStroke(1.dp, Color.Black))
+                    .padding(8.dp)
+
+            ) {
+                Column {
+                    Text("Cliente: ${cita.cliente}")
+                    Text("Teléfono: ${cita.telefono}")
+                    Text("Fecha: ${cita.fecha}")
+                    Text("Hora: ${cita.hora}")
                 }
             }
         }
