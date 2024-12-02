@@ -37,7 +37,6 @@ import androidx.navigation.NavController
 import com.example.crm_mara.ui.theme.ZendotsFamily
 import com.google.firebase.firestore.FirebaseFirestore
 
-//no
 @Composable
 fun InicioSesion(navController: NavController) {
     var nombre by remember { mutableStateOf("") }

@@ -62,6 +62,14 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
+    // Dependencia para usar ViewModel con Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+
+    implementation ("androidx.compose.material3:material3:1.0.0") // Asegúrate de tener la versión correcta
+
+    // Extended Iconsa
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
     // Dependencias de Firebase
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation(platform(libs.firebase.bom))
