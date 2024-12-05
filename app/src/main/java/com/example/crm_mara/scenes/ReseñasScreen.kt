@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -36,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -48,7 +52,7 @@ data class Reseña(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReseñasScreen(usuarioActual: String) {
+fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) {
     val context = LocalContext.current
 
     // Instancia de Firebase Firestore
@@ -80,6 +84,7 @@ fun ReseñasScreen(usuarioActual: String) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Título de la sección de reseñas
         Text(
             text = "Reseñas",
             fontSize = 26.sp,
@@ -227,6 +232,44 @@ fun ReseñasScreen(usuarioActual: String) {
                         )
                     }
                 }
+            }
+        }
+
+        // Spacer para empujar los botones hacia la parte inferior
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Botones de navegación en la parte inferior
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = { navHostController.navigate("agenda") },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarToday,
+                    contentDescription = "Ir a Agenda",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Button(
+                onClick = { navHostController.navigate("tiposCortes") },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.People,
+                    contentDescription = "Cortes",
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     }

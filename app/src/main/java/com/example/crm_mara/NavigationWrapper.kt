@@ -15,7 +15,8 @@ import com.example.crm_mara.scenes.InfoClientes
 import com.example.crm_mara.scenes.InicioSesion
 import com.example.crm_mara.scenes.TiposCortes
 import com.example.crm_mara.scenes.Registro
-import com.example.crm_mara.viewmodel.ThemeViewModel
+import com.example.crm_mara.scenes.ReseñasScreen
+
 
 @Composable
 fun NavigationWrapper (navHostController: NavHostController) {
@@ -31,6 +32,9 @@ fun NavigationWrapper (navHostController: NavHostController) {
         composable("InfoClientes") { InfoClientes(navHostController) }
         composable("Registro") { Registro(navHostController) }
         composable("TiposCortes") { TiposCortes(navHostController) }
+        composable(route = "reseñasScreen") {
+            ReseñasScreen(usuarioActual = "UsuarioEjemplo", navHostController = navHostController)
+        }
 
         // Modo Oscuro
 

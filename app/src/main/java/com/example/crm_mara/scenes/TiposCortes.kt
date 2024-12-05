@@ -95,7 +95,7 @@ fun TiposCortes(navHostController: NavHostController) {
                 )
             }
             Button(
-                onClick = { navHostController.navigate("ReseñasScreen") }, // Navega hacia la pantalla "Hola Mundo"
+                onClick = { navHostController.navigate("reseñasScreen") }, // Cambiado a "reseñasScreen"
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
@@ -107,6 +107,7 @@ fun TiposCortes(navHostController: NavHostController) {
                     modifier = Modifier.size(24.dp)
                 )
             }
+
         }
     }
 }
