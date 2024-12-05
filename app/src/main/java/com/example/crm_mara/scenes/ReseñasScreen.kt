@@ -43,8 +43,9 @@ import androidx.navigation.NavHostController
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-// Modelo de datos para una reseña
+// Modelo de datos para una reseña con un campo 'id' único
 data class Reseña(
+    val id: String = "",
     val nombreUsuario: String = "",
     val comentario: String = "",
     val calificacion: Int = 0
@@ -74,8 +75,8 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                 val listaReseñas = documents.mapNotNull { it.toObject(Reseña::class.java) }
                 reseñas = listaReseñas
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Error al cargar las reseñas", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error al cargar las reseñas: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -134,11 +135,17 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
         Button(
             onClick = {
                 if (comentario.text.isNotBlank()) {
-                    val nuevaReseña = Reseña(usuarioActual, comentario.text, calificacion)
+                    val nuevaReseña = Reseña(
+                        id = db.collection("reseñas").document().id,  // Crear un ID único
+                        nombreUsuario = usuarioActual,
+                        comentario = comentario.text,
+                        calificacion = calificacion
+                    )
 
                     // Guardar reseña en Firebase
                     db.collection("reseñas")
-                        .add(nuevaReseña)
+                        .document(nuevaReseña.id)
+                        .set(nuevaReseña)
                         .addOnSuccessListener {
                             Toast.makeText(context, "Reseña añadida", Toast.LENGTH_SHORT).show()
 
@@ -149,8 +156,8 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                             comentario = TextFieldValue("")
                             calificacion = 0
                         }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Error al añadir la reseña", Toast.LENGTH_SHORT).show()
+                        .addOnFailureListener { e ->
+                            Toast.makeText(context, "Error al añadir la reseña: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                 } else {
                     errorMensaje = "El comentario no puede estar vacío."
@@ -212,21 +219,16 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                    val reseñaId = reseñas[index]
+                                    // Eliminar la reseña de Firebase
                                     db.collection("reseñas")
-                                        .whereEqualTo("nombreUsuario", reseñaId.nombreUsuario)
-                                        .whereEqualTo("comentario", reseñaId.comentario)
-                                        .whereEqualTo("calificacion", reseñaId.calificacion)
-                                        .get()
-                                        .addOnSuccessListener { documents ->
-                                            for (document in documents) {
-                                                db.collection("reseñas").document(document.id).delete()
-                                            }
+                                        .document(reseña.id)
+                                        .delete()
+                                        .addOnSuccessListener {
                                             Toast.makeText(context, "Reseña eliminada", Toast.LENGTH_SHORT).show()
-                                            reseñas = reseñas.toMutableList().also { it.removeAt(index) }
+                                            reseñas = reseñas.toMutableList().apply { removeAt(index) }
                                         }
-                                        .addOnFailureListener {
-                                            Toast.makeText(context, "Error al eliminar la reseña", Toast.LENGTH_SHORT).show()
+                                        .addOnFailureListener { e ->
+                                            Toast.makeText(context, "Error al eliminar la reseña: ${e.message}", Toast.LENGTH_SHORT).show()
                                         }
                                 }
                         )
