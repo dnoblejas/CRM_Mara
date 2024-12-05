@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation("com.google.code.gson:gson:2.8.9")
+
 
     // Dependencia para usar ViewModel con Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
@@ -84,5 +86,6 @@ dependencies {
 
     //Para el uso de iconos
     implementation ("androidx.compose.material:material-icons-extended:1.5.1")
+    implementation(libs.androidx.recyclerview)
 
 }

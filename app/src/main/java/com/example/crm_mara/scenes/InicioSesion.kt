@@ -1,5 +1,6 @@
 package com.example.crm_mara.scenes
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -14,13 +15,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.crm_mara.viewmodel.ThemeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -31,6 +32,8 @@ fun InicioSesion(navController: NavController) {
 
     // Instancia de Firebase Firestore
     val db = FirebaseFirestore.getInstance()
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -85,7 +88,12 @@ fun InicioSesion(navController: NavController) {
                         .get()
                         .addOnSuccessListener { documents ->
                             if (!documents.isEmpty) {
-                                // Usuario encontrado, navega a la pantalla de menú
+                                // Usuario encontrado, guardar el nombre del usuario en SharedPreferences
+                                val editor = sharedPreferences.edit()
+                                editor.putString("usuario_actual", nombre)
+                                editor.apply()
+
+                                // Navega a la pantalla de menú
                                 navController.navigate("TiposCortes")
                             } else {
                                 // Usuario no encontrado, muestra un mensaje de error

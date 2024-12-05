@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.crm_mara.R
-import com.example.crm_mara.viewmodel.ThemeViewModel
+
 
 // Modelo de datos
 data class Corte(val name: String, val price: String, val imageRes: Int)
