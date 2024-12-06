@@ -7,21 +7,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
+import com.example.crm_mara.ui.theme.ZendotsFamily
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -29,36 +24,45 @@ fun InicioSesionOscuro(navController: NavController) {
     var nombre by remember { mutableStateOf("") }
     var contraseña by remember { mutableStateOf("") }
     var loginError by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
-    // Instancia de Firebase Firestore
     val db = FirebaseFirestore.getInstance()
 
-    // Colores para el modo claro
-    val backgroundColor = Color(0xFF0E0B2E)
-    val textColor = Color.White
-    val buttonColor = Color.Black
+    // Colores y estilo para modo oscuro
+    val backgroundColor = Color(0xFF0E0B2E) // Fondo oscuro
+    val textColor = Color.White // Texto blanco
+    val buttonColor = Color(0xFF3D3D3D) // Botón gris oscuro
 
     Box(
         modifier = Modifier
-            .fillMaxSize() // Asegura que el Box ocupe toda la pantalla
-            .background(backgroundColor) // Fondo personalizado
+            .fillMaxSize()
+            .background(backgroundColor)
     ) {
-
-
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 15.dp, end = 15.dp)
-                //.background(backgroundColor)
         ) {
-            // Título MARA
+            // Título dividido en dos líneas con tipografía Zendots
             Text(
-                text = "MARA NOCHE",
+                text = "MA",
                 color = textColor,
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 90.sp,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = ZendotsFamily,
+                    fontSize = 90.sp
+                )
+            )
+            Text(
+                text = "RA",
+                color = textColor,
+                fontSize = 90.sp,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = ZendotsFamily,
+                    fontSize = 90.sp
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
 
@@ -66,7 +70,7 @@ fun InicioSesionOscuro(navController: NavController) {
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Usuario", color = textColor) },
+                label = { Text("Usuario", color = textColor, fontFamily = ZendotsFamily) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -78,14 +82,13 @@ fun InicioSesionOscuro(navController: NavController) {
                     unfocusedIndicatorColor = textColor
                 )
             )
-
             Spacer(modifier = Modifier.size(16.dp))
 
             // Campo de texto para contraseña
             OutlinedTextField(
                 value = contraseña,
                 onValueChange = { contraseña = it },
-                label = { Text("Contraseña", color = textColor) },
+                label = { Text("Contraseña", color = textColor, fontFamily = ZendotsFamily) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth(),
@@ -99,56 +102,66 @@ fun InicioSesionOscuro(navController: NavController) {
                     unfocusedIndicatorColor = textColor
                 )
             )
-
             Spacer(modifier = Modifier.size(24.dp))
 
-            // Mensaje de error si existe
+            // Mensaje de error
             if (loginError.isNotEmpty()) {
-                Text(text = loginError, color = Color.Red)
+                Text(
+                    text = loginError,
+                    color = Color.Red,
+                    fontFamily = ZendotsFamily
+                )
             }
 
             // Botón para iniciar sesión
             Button(
                 onClick = {
-                    if (nombre.isNotEmpty() && contraseña.isNotEmpty()) {
-                        db.collection("clientes")
-                            .whereEqualTo("nombre", nombre)
-                            .whereEqualTo("contraseña", contraseña)
-                            .get()
-                            .addOnSuccessListener { documents ->
-                                if (!documents.isEmpty) {
-                                    // Usuario encontrado, navega a la pantalla de menú
-                                    navController.navigate("TiposCortesOscuro")
-                                } else {
-                                    // Usuario no encontrado, muestra un mensaje de error
-                                    loginError = "Usuario no registrado"
-                                }
-                            }
-                            .addOnFailureListener {
-                                // Error en la consulta a Firebase
-                                loginError = "Error de conexión, intenta de nuevo"
-                            }
-                    } else {
+                    if (nombre.isEmpty() || contraseña.isEmpty()) {
                         loginError = "Por favor, completa todos los campos"
+                        return@Button
                     }
+
+                    isLoading = true
+                    db.collection("clientes")
+                        .whereEqualTo("nombre", nombre)
+                        .whereEqualTo("contraseña", contraseña)
+                        .get()
+                        .addOnSuccessListener { documents ->
+                            isLoading = false
+                            if (!documents.isEmpty) {
+                                navController.navigate("TiposCortesOscuro")
+                            } else {
+                                loginError = "Usuario o contraseña incorrectos"
+                            }
+                        }
+                        .addOnFailureListener {
+                            isLoading = false
+                            loginError = "Error de conexión, intenta de nuevo"
+                        }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 contentPadding = PaddingValues(12.dp)
             ) {
-                Text(
-                    text = "Iniciar Sesión",
-                    color = Color.Black,
-                    fontSize = 20.sp
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(color = textColor, modifier = Modifier.size(24.dp))
+                } else {
+                    Text(
+                        text = "Iniciar Sesión",
+                        color = textColor,
+                        fontSize = 20.sp,
+                        fontFamily = ZendotsFamily
+                    )
+                }
             }
 
             // Botón para registro
             Button(
                 onClick = { navController.navigate("RegistroOscuro") },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
@@ -156,19 +169,19 @@ fun InicioSesionOscuro(navController: NavController) {
             ) {
                 Text(
                     text = "Registro",
-                    color = Color.Black,
-                    fontSize = 20.sp
+                    color = textColor,
+                    fontSize = 20.sp,
+                    fontFamily = ZendotsFamily
                 )
             }
 
             Spacer(modifier = Modifier.size(32.dp))
 
-            // Íconos de sol y luna
+            // Íconos para modo claro y oscuro
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Botón de sol (WbSunny)
                 IconButton(
                     onClick = { navController.navigate("InicioSesion") },
                     modifier = Modifier.size(48.dp)
@@ -180,12 +193,9 @@ fun InicioSesionOscuro(navController: NavController) {
                         modifier = Modifier.size(32.dp)
                     )
                 }
-
                 Spacer(modifier = Modifier.size(16.dp))
-
-                // Botón de luna (DarkMode)
                 IconButton(
-                    onClick = { navController.navigate("InicioSesionOscuro") },  // Aquí cambiamos a la pantalla de "InicioSesion"
+                    onClick = { navController.navigate("InicioSesionOscuro") },
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
@@ -198,4 +208,4 @@ fun InicioSesionOscuro(navController: NavController) {
             }
         }
     }
-    }
+}

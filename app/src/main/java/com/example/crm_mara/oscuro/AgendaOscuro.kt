@@ -5,16 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
@@ -30,15 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import java.time.format.TextStyle
+import java.util.Locale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.crm_mara.ui.theme.ZendotsFamily
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Locale
 
 // Modelo de Cita
 data class Cita(
@@ -59,7 +50,7 @@ fun AgendaOscuro(navHostController: NavHostController) {
     var telefono by remember { mutableStateOf("") }
     var hora by remember { mutableStateOf("") }
 
-    // Colores para el modo claro
+    // Colores para el modo oscuro
     val backgroundColor = Color(0xFF0E0B2E)
     val textColor = Color.White
     val buttonColor = Color.Black
@@ -74,7 +65,6 @@ fun AgendaOscuro(navHostController: NavHostController) {
             .fillMaxSize() // Asegura que el Box ocupe toda la pantalla
             .background(backgroundColor) // Fondo personalizado
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -87,6 +77,7 @@ fun AgendaOscuro(navHostController: NavHostController) {
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
+                fontFamily = ZendotsFamily,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -106,7 +97,7 @@ fun AgendaOscuro(navHostController: NavHostController) {
                     ),
                     modifier = Modifier.size(36.dp) // Tamaño más pequeño
                 ) {
-                    Text("<", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("<", fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = ZendotsFamily)
                 }
 
                 // Título del mes y año
@@ -115,6 +106,7 @@ fun AgendaOscuro(navHostController: NavHostController) {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
+                    fontFamily = ZendotsFamily,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
@@ -125,9 +117,9 @@ fun AgendaOscuro(navHostController: NavHostController) {
                         containerColor = Color.Transparent,
                         contentColor = Color.White
                     ),
-                    modifier = Modifier.size(36.dp) // Tamaño más pequeño
+                    modifier = Modifier.size(36.dp)
                 ) {
-                    Text(">", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(">", fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = ZendotsFamily)
                 }
             }
 
@@ -146,8 +138,8 @@ fun AgendaOscuro(navHostController: NavHostController) {
                             text = day,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(8.dp),
-                            color = Color.Gray
+                            color = Color.Gray,
+                            modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
@@ -188,8 +180,10 @@ fun AgendaOscuro(navHostController: NavHostController) {
             selectedDate?.let {
                 Text(
                     text = "Fecha seleccionada: $it",
-                    modifier = Modifier.padding(top = 16.dp),
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    fontFamily = ZendotsFamily,
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
 
@@ -198,21 +192,48 @@ fun AgendaOscuro(navHostController: NavHostController) {
             TextField(
                 value = cliente,
                 onValueChange = { cliente = it },
-                label = { Text("Nombre del Cliente") },
+                label = {
+                    Text(
+                        text = "Nombre del Cliente",
+                        fontFamily = ZendotsFamily
+                    )
+                },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontFamily = ZendotsFamily,
+                    color = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = telefono,
                 onValueChange = { telefono = it },
-                label = { Text("Teléfono") },
+                label = {
+                    Text(
+                        text = "Teléfono",
+                        fontFamily = ZendotsFamily
+                    )
+                },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontFamily = ZendotsFamily,
+                    color = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = hora,
                 onValueChange = { hora = it },
-                label = { Text("Hora (ej. 18:00)") },
+                label = {
+                    Text(
+                        text = "Hora (ej. 18:00)",
+                        fontFamily = ZendotsFamily
+                    )
+                },
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontFamily = ZendotsFamily,
+                    color = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -250,15 +271,20 @@ fun AgendaOscuro(navHostController: NavHostController) {
                     contentColor = Color.Black
                 )
             ) {
-                Text("Guardar Cita")
+                Text(
+                    text = "Guardar Cita",
+                    fontFamily = ZendotsFamily
+                )
             }
 
             // Lista de citas guardadas
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Citas Guardadas:", color = Color.White,
+                text = "Citas Guardadas:",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color.White,
+                fontFamily = ZendotsFamily,
                 modifier = Modifier.align(Alignment.Start)
             )
             savedCitas.forEach { cita ->
@@ -266,45 +292,15 @@ fun AgendaOscuro(navHostController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .border(BorderStroke(1.dp, Color.White))
+                        .border(BorderStroke(1.dp, Color.Gray))
+                        .background(Color(0xFF1E1B48))
                         .padding(8.dp)
                 ) {
-                    Column {
-                        Text("Cliente: ${cita.cliente}", color = Color.White)
-                        Text("Teléfono: ${cita.telefono}", color = Color.White)
-                        Text("Fecha: ${cita.fecha}", color = Color.White)
-                        Text("Hora: ${cita.hora}", color = Color.White)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f)) // Empuja los botones hacia abajo
-
-            // Botones de navegación
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { navHostController.navigate("TiposCortesOscuro") },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
+                    Text(
+                        text = "Cliente: ${cita.cliente}, Fecha: ${cita.fecha}, Hora: ${cita.hora}",
+                        color = Color.White,
+                        fontFamily = ZendotsFamily
                     )
-                ) {
-                    Text(text = "Ir a Cortes")
-                }
-                Button(
-                    onClick = { navHostController.navigate("CitasClientes") },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    )
-                ) {
-                    Text(text = "Ir a Citas Clientes")
                 }
             }
         }

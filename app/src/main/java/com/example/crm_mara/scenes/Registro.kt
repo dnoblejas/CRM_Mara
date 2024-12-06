@@ -1,5 +1,6 @@
 package com.example.crm_mara.scenes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,9 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.crm_mara.ui.theme.ZendotsFamily
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.regex.Pattern
 
@@ -50,18 +53,38 @@ fun Registro(navController: NavController) {
 
                 val db = FirebaseFirestore.getInstance()
 
-                OutlinedTextField(value = nif, onValueChange = { nif = it }, label = { Text("NIF") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = nif,
+                    onValueChange = { nif = it },
+                    label = { Text("NIF", fontFamily = ZendotsFamily, fontSize = 15.sp) },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.size(8.dp))
-                OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre", fontFamily = ZendotsFamily, fontSize = 15.sp) },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.size(8.dp))
-                OutlinedTextField(value = direccion, onValueChange = { direccion = it }, label = { Text("Dirección") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = direccion,
+                    onValueChange = { direccion = it },
+                    label = { Text("Dirección", fontFamily = ZendotsFamily, fontSize = 15.sp) },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.size(8.dp))
-                OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Teléfono") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = telefono,
+                    onValueChange = { telefono = it },
+                    label = { Text("Teléfono", fontFamily = ZendotsFamily, fontSize = 15.sp) },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.size(8.dp))
                 OutlinedTextField(
                     value = contraseña,
                     onValueChange = { contraseña = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Contraseña", fontFamily = ZendotsFamily, fontSize = 15.sp) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
@@ -121,7 +144,12 @@ fun Registro(navController: NavController) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
-                        Text(text = "Guardar", color = Color.White)
+                        Text(
+                            text = "Guardar",
+                            color = Color.White,
+                            fontFamily = ZendotsFamily,
+                            fontSize = 20.sp
+                        )
                     }
                 }
 
@@ -129,6 +157,8 @@ fun Registro(navController: NavController) {
 
                 Text(
                     text = mensajeConfirmacion,
+                    fontFamily = ZendotsFamily,
+                    fontSize = 16.sp,
                     color = if (mensajeConfirmacion.contains("correctamente")) Color.Green else Color.Red,
                     modifier = Modifier.padding(8.dp)
                 )

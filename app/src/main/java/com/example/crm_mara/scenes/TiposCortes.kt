@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.crm_mara.R
+import com.example.crm_mara.ui.theme.ZendotsFamily
 
 // Modelo de datos
 data class Corte(val name: String, val price: String, val imageRes: Int)
@@ -44,7 +46,6 @@ fun TiposCortes(navHostController: NavHostController) {
         Corte("Corte 12", "$40", R.drawable.mara12)
     )
 
-
     // Contenedor principal
     Column(
         modifier = Modifier
@@ -55,7 +56,7 @@ fun TiposCortes(navHostController: NavHostController) {
         Text(
             text = "Cortes",
             fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
+            fontFamily = ZendotsFamily, // Usando la tipografía Zendots
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 24.dp),
@@ -95,7 +96,7 @@ fun TiposCortes(navHostController: NavHostController) {
                 )
             }
             Button(
-                onClick = { navHostController.navigate("reseñasScreen") }, // Cambiado a "reseñasScreen"
+                onClick = { navHostController.navigate("ReseñasScreen") },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
@@ -107,7 +108,6 @@ fun TiposCortes(navHostController: NavHostController) {
                     modifier = Modifier.size(24.dp)
                 )
             }
-
         }
     }
 }
@@ -140,6 +140,7 @@ fun CorteItem(corte: Corte) {
         Text(
             text = corte.price,
             fontSize = 14.sp,
+            fontFamily = ZendotsFamily,
             color = Color.Gray,
             modifier = Modifier.padding(top = 4.dp)
         )

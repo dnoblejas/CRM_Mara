@@ -20,7 +20,7 @@ import com.example.crm_mara.scenes.TiposCortes
 @Composable
 fun NavigationWrapper (navHostController: NavHostController) {
 
-    NavHost(navController = navHostController, startDestination = "InicioSesionOscuro") {
+    NavHost(navController = navHostController, startDestination = "InicioSesion") {
 
         // Modo día
 

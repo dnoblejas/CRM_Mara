@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.crm_mara.R
-
+import com.example.crm_mara.ui.theme.ZendotsFamily
 
 // Modelo de datos
 data class Corte(val name: String, val price: String, val imageRes: Int)
@@ -46,29 +46,26 @@ fun TiposCortesOscuro(navHostController: NavHostController) {
         Corte("Corte 12", "$40", R.drawable.mara12)
     )
 
-    // Colores para el modo claro
+    // Colores para el modo oscuro
     val backgroundColor = Color(0xFF0E0B2E)
     val textColor = Color.White
-    val buttonColor = Color.Black
 
     Box(
         modifier = Modifier
             .fillMaxSize() // Asegura que el Box ocupe toda la pantalla
             .background(backgroundColor) // Fondo personalizado
     ) {
-
         // Contenedor principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                //.background(backgroundColor) // Fondo personalizado
         ) {
             // Título
             Text(
-                text = "Cortes Oscuro",
+                text = "Cortes",
                 fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
+                fontFamily = ZendotsFamily,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 24.dp),
@@ -153,6 +150,7 @@ fun CorteItem(corte: Corte) {
         Text(
             text = corte.price,
             fontSize = 14.sp,
+            fontFamily = ZendotsFamily,
             color = Color.Gray,
             modifier = Modifier.padding(top = 4.dp)
         )
