@@ -183,14 +183,15 @@ fun Agenda(navController: NavController) {
             }
         }
 
+        // Grill del calendario
         LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
+            columns = GridCells.Fixed(7), // 7 columnas para los días de la semana
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(300.dp) // Altura fija
         ) {
-            val weekDays = listOf("L", "M", "X", "J", "V", "S", "D")
-            weekDays.forEach { day ->
+            val weekDays = listOf("L", "M", "X", "J", "V", "S", "D") // Días de la semana
+            weekDays.forEach { day -> // Encabezados de los días
                 item {
                     Text(
                         text = day,
@@ -207,7 +208,9 @@ fun Agenda(navController: NavController) {
                 item { Spacer(modifier = Modifier.height(40.dp)) }
             }
 
-            for (day in 1..daysInMonth) {
+            // los días del mes
+            for (day in 1..daysInMonth) {  // Itera desde 1 hasta el número total de días en el mes actual.
+                // Intenta crear una instancia de LocalDate para ese día, y captura cualquier excepción que ocurra
                 val date = runCatching { currentYearMonth.atDay(day) }.getOrNull()
 
                 item {
@@ -217,7 +220,7 @@ fun Agenda(navController: NavController) {
                                 .padding(4.dp)
                                 .border(
                                     BorderStroke(
-                                        if (selectedDate == date) 2.dp else 1.dp,
+                                        if (selectedDate == date) 2.dp else 1.dp, // Borde más grueso si la fecha está seleccionada
                                         if (selectedDate == date) Color.Blue else Color.Gray
                                     )
                                 )

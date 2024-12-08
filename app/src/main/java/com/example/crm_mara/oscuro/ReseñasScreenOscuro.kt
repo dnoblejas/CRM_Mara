@@ -1,18 +1,10 @@
-package com.example.crm_mara.scenes
+package com.example.crm_mara.oscuro
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
@@ -25,16 +17,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -43,7 +29,7 @@ import androidx.navigation.NavHostController
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-// Modelo de datos para una reseña con un campo 'id' único
+// Modelo de datos para una reseña
 data class Reseña(
     val id: String = "",
     val nombreUsuario: String = "",
@@ -53,143 +39,124 @@ data class Reseña(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) {
-    val context = LocalContext.current
+fun ReseñasScreenOscuro(usuarioActual: String, navHostController: NavHostController) {
+    val backgroundColor = Color(0xFF0E0B2E)
+    val textColor = Color.White
+    val cardBackgroundColor = Color(0xFF1E1B48)
 
-    // Instancia de Firebase Firestore
     val db = Firebase.firestore
 
-    // Estado de las reseñas cargadas
+    // Estado de reseñas y campos de entrada
     var reseñas by remember { mutableStateOf<List<Reseña>>(emptyList()) }
-
-    // Variables de estado para el formulario
     var comentario by remember { mutableStateOf(TextFieldValue("")) }
     var calificacion by remember { mutableStateOf(0) }
     var errorMensaje by remember { mutableStateOf("") }
 
-    // Cargar las reseñas desde Firestore
+    // Cargar reseñas de Firestore
     LaunchedEffect(Unit) {
         db.collection("reseñas")
             .get()
             .addOnSuccessListener { documents ->
-                val listaReseñas = documents.mapNotNull { it.toObject(Reseña::class.java) }
-                reseñas = listaReseñas
+                reseñas = documents.mapNotNull { it.toObject(Reseña::class.java) }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Error al cargar las reseñas: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(navHostController.context, "Error al cargar: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(backgroundColor)
             .padding(16.dp)
     ) {
-        // Título de la sección de reseñas
+        // Título
         Text(
             text = "Reseñas",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 24.dp),
-            color = Color.Black
+            color = textColor,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Campo para comentario
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Entrada de comentario
         TextField(
             value = comentario,
             onValueChange = { comentario = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            label = { Text("Escribe tu comentario") },
-            singleLine = false,
+            label = { Text("Escribe tu comentario", color = textColor) },
+            textStyle = androidx.compose.ui.text.TextStyle(color = textColor),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent
-            )
+                containerColor = Color.Transparent,
+                focusedIndicatorColor = Color.White,
+                unfocusedIndicatorColor = Color.Gray
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
 
-        // Selector de estrellas para calificación.
+        // Selector de estrellas
         Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Calificación: ", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            for (i in 1..5) { // Crea 5 estrellas para seleccionar la calificación.
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Calificación: ", color = textColor, fontWeight = FontWeight.Bold)
+            for (i in 1..5) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "Estrella",
-                    tint = if (i <= calificacion) Color.Yellow else Color.Gray, // Estrella activa/inactiva.
+                    tint = if (i <= calificacion) Color.Yellow else Color.Gray,
                     modifier = Modifier
                         .size(32.dp)
-                        .padding(4.dp)
-                        .clickable { calificacion = i } // Actualiza la calificación seleccionada.
+                        .clickable { calificacion = i }
                 )
             }
         }
 
-        // Botón para añadir la reseña
+        // Botón de añadir reseña
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 if (comentario.text.isNotBlank()) {
                     val nuevaReseña = Reseña(
-                        id = db.collection("reseñas").document().id,  // Crear un ID único
+                        id = db.collection("reseñas").document().id,
                         nombreUsuario = usuarioActual,
                         comentario = comentario.text,
                         calificacion = calificacion
                     )
-
-                    // Guardar reseña en Firebase
-                    db.collection("reseñas")
-                        .document(nuevaReseña.id)
-                        .set(nuevaReseña)
+                    db.collection("reseñas").document(nuevaReseña.id).set(nuevaReseña)
                         .addOnSuccessListener {
-                            Toast.makeText(context, "Reseña añadida", Toast.LENGTH_SHORT).show()
-
-                            // Actualizar estado local
                             reseñas = reseñas + nuevaReseña
-
-                            // Limpiar campos después de agregar reseña
                             comentario = TextFieldValue("")
                             calificacion = 0
+                            Toast.makeText(navHostController.context, "Reseña añadida", Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener { e ->
-                            Toast.makeText(context, "Error al añadir la reseña: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(navHostController.context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                 } else {
                     errorMensaje = "El comentario no puede estar vacío."
                 }
             },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(8.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White)
         ) {
             Text("Añadir Reseña")
         }
 
         if (errorMensaje.isNotEmpty()) {
-            Text(text = errorMensaje, color = Color.Red, modifier = Modifier.padding(8.dp))
+            Text(errorMensaje, color = Color.Red, modifier = Modifier.padding(8.dp))
         }
 
-        // Mostrar las reseñas existentes
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Reseñas existentes:",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(8.dp)
-        )
+        Text("Reseñas existentes:", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textColor)
 
-        Column {
-            reseñas.forEachIndexed { index, reseña ->
+        // Mostrar reseñas
+        Column(modifier = Modifier.weight(1f)) {
+            reseñas.forEach { reseña ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .border(1.dp, Color.Black)
+                        .background(cardBackgroundColor)
+                        .border(1.dp, Color.Gray)
                         .padding(8.dp)
                 ) {
                     Row(
@@ -197,18 +164,13 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = "Usuario: ${reseña.nombreUsuario}", fontWeight = FontWeight.Bold)
-                            Text(text = "Comentario: ${reseña.comentario}")
+                        Column {
+                            Text("Usuario: ${reseña.nombreUsuario}", color = textColor, fontWeight = FontWeight.Bold)
+                            Text("Comentario: ${reseña.comentario}", color = textColor)
                             Row {
-                                Text("Calificación: ", fontWeight = FontWeight.Bold)
+                                Text("Calificación: ", color = textColor, fontWeight = FontWeight.Bold)
                                 repeat(reseña.calificacion) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = "Estrella",
-                                        tint = Color.Yellow,
-                                        modifier = Modifier.size(16.dp)
-                                    )
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
                                 }
                             }
                         }
@@ -219,26 +181,15 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                    // Eliminar la reseña de Firebase
-                                    db.collection("reseñas")
-                                        .document(reseña.id)
-                                        .delete()
-                                        .addOnSuccessListener {
-                                            Toast.makeText(context, "Reseña eliminada", Toast.LENGTH_SHORT).show()
-                                            reseñas = reseñas.toMutableList().apply { removeAt(index) }
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Toast.makeText(context, "Error al eliminar la reseña: ${e.message}", Toast.LENGTH_SHORT).show()
-                                        }
+                                    db.collection("reseñas").document(reseña.id).delete().addOnSuccessListener {
+                                        reseñas = reseñas.filter { it.id != reseña.id }
+                                    }
                                 }
                         )
                     }
                 }
             }
         }
-
-        // Spacer para empujar los botones hacia la parte inferior
-        Spacer(modifier = Modifier.weight(1f))
 
         // Botones de navegación en la parte inferior
         Row(
@@ -248,7 +199,7 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { navHostController.navigate("agenda") },
+                onClick = { navHostController.navigate("AgendaOscuro") },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
@@ -261,7 +212,7 @@ fun ReseñasScreen(usuarioActual: String, navHostController: NavHostController) 
                 )
             }
             Button(
-                onClick = { navHostController.navigate("tiposCortes") },
+                onClick = { navHostController.navigate("TiposCortesOscuro") },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White

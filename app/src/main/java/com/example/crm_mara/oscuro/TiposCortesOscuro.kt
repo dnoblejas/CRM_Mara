@@ -105,7 +105,7 @@ fun TiposCortesOscuro(navHostController: NavHostController) {
                     )
                 }
                 Button(
-                    onClick = { navHostController.navigate("citasClientes") },
+                    onClick = { navHostController.navigate("ReseñasScreenOscuro") },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black,
                         contentColor = Color.White

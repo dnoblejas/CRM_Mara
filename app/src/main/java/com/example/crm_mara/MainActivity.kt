@@ -1,5 +1,6 @@
 package com.example.crm_mara
 
+import NavigationWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.crm_mara.NavigationWrapper
 
 class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
